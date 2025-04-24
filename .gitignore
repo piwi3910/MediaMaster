@@ -60,3 +60,5 @@ web/.env.production.local
 .history
 .vercel
 .netlify
+.vite
+web/.vite
