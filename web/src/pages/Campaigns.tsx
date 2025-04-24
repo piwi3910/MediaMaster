@@ -1,21 +1,25 @@
 import { useState } from 'react';
-import { 
-  Badge, 
-  Button, 
-  Card, 
-  Grid, 
-  Group, 
-  Menu, 
-  Paper, 
-  Progress, 
-  Select, 
-  Stack, 
-  Tabs, 
-  Text, 
-  TextInput, 
+import { useNavigate } from 'react-router-dom';
+import {
+  Badge,
+  Button,
+  Card,
+  Grid,
+  Group,
+  Menu,
+  Paper,
+  Progress,
+  Select,
+  Stack,
+  Tabs,
+  Text,
+  TextInput,
   Title,
-  ActionIcon
+  ActionIcon,
+  Modal,
+  DateRangePicker
 } from '@mantine/core';
+import { DateRangePickerValue } from '@mantine/dates';
 import { 
   IconAdjustments, 
   IconCalendar, 
@@ -205,11 +209,14 @@ function PerformanceBadge({ performance }: { performance?: string }) {
 }
 
 export function Campaigns() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string | null>('all');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [platformFilter, setPlatformFilter] = useState<string | null>(null);
   const [objectiveFilter, setObjectiveFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [dateRangeModalOpen, setDateRangeModalOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRangePickerValue>([null, null]);
 
   // Filter campaigns based on active tab, search, and filters
   const filteredCampaigns = mockCampaigns.filter((campaign) => {
@@ -241,7 +248,12 @@ export function Campaigns() {
                 </ActionIcon>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Item icon={<IconEdit size={16} />}>Edit</Menu.Item>
+                <Menu.Item
+                  icon={<IconEdit size={16} />}
+                  onClick={() => navigate(`/campaigns/${campaign.id}/edit`)}
+                >
+                  Edit
+                </Menu.Item>
                 <Menu.Item icon={<IconChartBar size={16} />}>View Analytics</Menu.Item>
                 {campaign.status === 'active' && (
                   <Menu.Item icon={<IconAdjustments size={16} />}>Pause</Menu.Item>
@@ -295,7 +307,14 @@ export function Campaigns() {
           color={campaign.progress > 90 ? 'red' : campaign.progress > 70 ? 'yellow' : 'blue'} 
         />
 
-        <Button variant="light" color="blue" fullWidth mt="md" rightIcon={<IconChevronRight size={16} />}>
+        <Button
+          variant="light"
+          color="blue"
+          fullWidth
+          mt="md"
+          rightIcon={<IconChevronRight size={16} />}
+          onClick={() => navigate(`/campaigns/${campaign.id}`)}
+        >
           View Details
         </Button>
       </Card>
@@ -306,7 +325,10 @@ export function Campaigns() {
     <MainLayout>
       <Group position="apart" mb="md">
         <Title order={2}>Campaigns</Title>
-        <Button leftSection={<IconPlus size={16} />}>
+        <Button
+          leftSection={<IconPlus size={16} />}
+          onClick={() => navigate('/campaigns/create')}
+        >
           Create Campaign
         </Button>
       </Group>
@@ -378,9 +400,37 @@ export function Campaigns() {
               ]}
               style={{ width: 150 }}
             />
-            <Button variant="outline" leftSection={<IconCalendar size={16} />}>
-              Date Range
+            <Button
+              variant="outline"
+              leftSection={<IconCalendar size={16} />}
+              onClick={() => setDateRangeModalOpen(true)}
+            >
+              {dateRange[0] && dateRange[1]
+                ? `${dateRange[0].toLocaleDateString()} - ${dateRange[1].toLocaleDateString()}`
+                : 'Date Range'
+              }
             </Button>
+
+            <Modal
+              opened={dateRangeModalOpen}
+              onClose={() => setDateRangeModalOpen(false)}
+              title="Select Date Range"
+              size="md"
+            >
+              <DateRangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                fullWidth
+                clearable
+              />
+              <Group position="right" mt="md">
+                <Button variant="outline" onClick={() => setDateRangeModalOpen(false)}>Cancel</Button>
+                <Button onClick={() => {
+                  // Apply date filter logic here
+                  setDateRangeModalOpen(false);
+                }}>Apply</Button>
+              </Group>
+            </Modal>
           </Group>
         </Group>
 
