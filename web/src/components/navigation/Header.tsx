@@ -1,26 +1,30 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ActionIcon, 
-  Avatar, 
-  Box, 
-  Burger, 
-  Group, 
-  Menu, 
-  Text, 
-  UnstyledButton, 
-  useMantineTheme 
+import {
+  ActionIcon,
+  Avatar,
+  Box,
+  Burger,
+  Group,
+  Menu,
+  Text,
+  UnstyledButton,
+  useMantineTheme,
+  Indicator,
+  Popover
 } from '@mantine/core';
-import { 
-  IconBell, 
-  IconChevronDown, 
-  IconLogout, 
-  IconMoonStars, 
-  IconSettings, 
-  IconSun, 
-  IconUser 
+import { notifications } from '@mantine/notifications';
+import {
+  IconBell,
+  IconChevronDown,
+  IconLogout,
+  IconMoonStars,
+  IconSettings,
+  IconSun,
+  IconUser
 } from '@tabler/icons-react';
 import { useAuth } from '../../context/AuthContext';
+import { useColorScheme } from '../../context/ColorSchemeContext';
 
 interface HeaderProps {
   opened: boolean;
@@ -30,12 +34,19 @@ interface HeaderProps {
 export function Header({ opened, toggle }: HeaderProps) {
   const theme = useMantineTheme();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const [notificationsOpened, setNotificationsOpened] = useState(false);
   const { user, logout } = useAuth();
+  const { colorScheme, toggleColorScheme } = useColorScheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleNotificationClick = () => {
+    setNotificationsOpened((o) => !o);
+    // In a real app, we would mark notifications as read here
   };
 
   // Get user initials for avatar
@@ -66,19 +77,43 @@ export function Header({ opened, toggle }: HeaderProps) {
       <Group>
         <ActionIcon
           variant="default"
-          onClick={() => {
-            // In a real app, we would use useMantineColorScheme() hook
-            // For now, we'll just show the button without functionality
-            console.log('Toggle color scheme');
-          }}
+          onClick={() => toggleColorScheme()}
           size="lg"
+          title="Toggle color scheme"
         >
-          {theme.colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+          {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
         </ActionIcon>
 
-        <ActionIcon variant="default" size="lg">
-          <IconBell size={18} />
-        </ActionIcon>
+        <Popover
+          width={300}
+          position="bottom-end"
+          withArrow
+          shadow="md"
+          opened={notificationsOpened}
+          onChange={setNotificationsOpened}
+        >
+          <Popover.Target>
+            <Indicator color="red" size={8} offset={4} withBorder>
+              <ActionIcon
+                variant="default"
+                size="lg"
+                onClick={handleNotificationClick}
+                title="Notifications"
+              >
+                <IconBell size={18} />
+              </ActionIcon>
+            </Indicator>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Text fw={500} size="sm" mb="xs">Notifications</Text>
+            <Text size="xs" c="dimmed">You have 3 unread notifications</Text>
+            <Box mt="md">
+              <Text size="sm">New campaign approval request</Text>
+              <Text size="sm" mt="xs">Content scheduled for publishing</Text>
+              <Text size="sm" mt="xs">Analytics report ready</Text>
+            </Box>
+          </Popover.Dropdown>
+        </Popover>
 
         <Menu
           width={260}
@@ -124,7 +159,7 @@ export function Header({ opened, toggle }: HeaderProps) {
               Settings
             </Menu.Item>
             <Menu.Divider />
-            <Menu.Item 
+            <Menu.Item
               leftSection={<IconLogout size={14} stroke={1.5} />}
               onClick={handleLogout}
             >

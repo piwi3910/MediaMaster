@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
@@ -15,22 +15,19 @@ import '@mantine/dates/styles.css'
 // Import custom theme
 import { theme } from './theme'
 
-// Import AuthProvider
+// Import Providers
 import { AuthProvider } from './context/AuthContext'
+import { ColorSchemeProvider, useColorScheme } from './context/ColorSchemeContext'
 
 // Import global styles
 import './index.css'
 import App from './App.tsx'
 
 function Root() {
-  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light');
-  
-  const toggleColorScheme = (value?: 'light' | 'dark') => {
-    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
-  };
+  const { colorScheme } = useColorScheme();
 
   return (
-    <MantineProvider 
+    <MantineProvider
       theme={{ ...theme, colorScheme }}
       defaultColorScheme="light"
     >
@@ -47,7 +44,9 @@ function Root() {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Root />
+      <ColorSchemeProvider>
+        <Root />
+      </ColorSchemeProvider>
     </BrowserRouter>
   </StrictMode>,
 )
