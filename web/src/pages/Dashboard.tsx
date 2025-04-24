@@ -1,50 +1,51 @@
-import { 
-  Badge, 
-  Button, 
-  Card, 
-  Grid, 
-  Group, 
-  Paper, 
-  Progress, 
-  RingProgress, 
-  Select, 
-  SimpleGrid, 
-  Stack, 
-  Text, 
-  Title 
+import {
+  Badge,
+  Button,
+  Card,
+  Grid,
+  Group,
+  Paper,
+  Progress,
+  RingProgress,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title
 } from '@mantine/core';
-import { 
-  IconArrowDownRight, 
-  IconArrowUpRight, 
-  IconCalendar, 
-  IconChartBar, 
-  IconChartLine, 
-  IconChevronRight, 
-  IconCoin, 
-  IconEye, 
-  IconRefresh, 
-  IconThumbUp, 
-  IconUsers 
+import {
+  IconArrowDownRight,
+  IconArrowUpRight,
+  IconCalendar,
+  IconChartBar,
+  IconChartLine,
+  IconChevronRight,
+  IconCoin,
+  IconEye,
+  IconRefresh,
+  IconThumbUp,
+  IconUsers
 } from '@tabler/icons-react';
 import { MainLayout } from '../layouts/MainLayout';
-import { 
-  AreaChart, 
-  Area, 
-  BarChart, 
-  Bar, 
-  LineChart, 
-  Line, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data for charts
 const performanceData = [
@@ -200,6 +201,7 @@ function StatCard({
 
 export function Dashboard() {
   const [dateRange, setDateRange] = useState<string | null>('last30');
+  const navigate = useNavigate();
 
   return (
     <MainLayout>
@@ -344,13 +346,24 @@ export function Dashboard() {
                     <Text size="xs" color="dimmed">
                       {campaign.progress}% complete
                     </Text>
-                    <Button variant="subtle" rightIcon={<IconChevronRight size={16} />} compact>
+                    <Button
+                      variant="subtle"
+                      rightIcon={<IconChevronRight size={16} />}
+                      compact
+                      onClick={() => navigate(`/campaigns/${campaign.id}`)}
+                    >
                       View Details
                     </Button>
                   </Group>
                 </Card>
               ))}
-              <Button variant="subtle" fullWidth>View All Campaigns</Button>
+              <Button
+                variant="subtle"
+                fullWidth
+                onClick={() => navigate('/campaigns')}
+              >
+                View All Campaigns
+              </Button>
             </Stack>
           </Paper>
         </Grid.Col>
@@ -368,13 +381,24 @@ export function Dashboard() {
                     <Text size="sm" color="dimmed">
                       Scheduled for {new Date(content.scheduledDate).toLocaleString()}
                     </Text>
-                    <Button variant="subtle" rightIcon={<IconChevronRight size={16} />} compact>
+                    <Button
+                      variant="subtle"
+                      rightIcon={<IconChevronRight size={16} />}
+                      compact
+                      onClick={() => navigate(`/content/${content.id}`)}
+                    >
                       View
                     </Button>
                   </Group>
                 </Card>
               ))}
-              <Button variant="subtle" fullWidth>View Content Calendar</Button>
+              <Button
+                variant="subtle"
+                fullWidth
+                onClick={() => navigate('/content?view=calendar')}
+              >
+                View Content Calendar
+              </Button>
             </Stack>
           </Paper>
         </Grid.Col>
@@ -385,7 +409,11 @@ export function Dashboard() {
           <Paper withBorder p="md">
             <Group position="apart" mb="md">
               <Title order={3}>Engagement Metrics</Title>
-              <Button variant="subtle" rightIcon={<IconChevronRight size={16} />}>
+              <Button
+                variant="subtle"
+                rightIcon={<IconChevronRight size={16} />}
+                onClick={() => navigate('/reports')}
+              >
                 View Detailed Analytics
               </Button>
             </Group>
